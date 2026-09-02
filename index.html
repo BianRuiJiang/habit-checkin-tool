@@ -6,31 +6,28 @@
     <title>习惯打卡与时间记录工具</title>
     <style>
         /* 
-         * 色彩心理学配置：
-         * --primary (沉稳蓝): 保持专注与效率，不具攻击性。
-         * --success (薄荷绿): 象征成长、完成，提供温和的正向多巴胺反馈。
-         * --timer-muted (极淡银灰): 降低“时间流逝”带来的焦虑感，使其退居幕后。
+         * 色彩权重升级：提升对比度，消除发虚感
          */
         :root {
-            --primary: #4f46e5;
+            --primary: #4338ca;         /* 更浓郁的深靛蓝 */
             --primary-light: #e0e7ff;
-            --bg-body: #f8fafc;
+            --bg-body: #e2e8f0;         /* 带有实体感的冷灰，衬托白色卡片 */
             --bg-card: #ffffff;
-            --text-main: #334155;
-            --text-muted: #94a3b8;
-            --text-faint: #cbd5e1;
-            --timer-muted: #d1d5db; 
-            --border-color: #f1f5f9;
-            --border-dark: #e2e8f0;
-            --success: #10b981;
-            --success-light: #ecfdf5;
-            --danger: #f43f5e;
+            --text-main: #0f172a;       /* 极深蓝灰，字迹更锐利 */
+            --text-muted: #475569;      /* 加深的次要文本色 */
+            --text-faint: #94a3b8;      /* 占位符颜色加深 */
+            --timer-muted: #94a3b8;     /* 计时器不那么透明，更有存在感 */
+            --border-color: #cbd5e1;    /* 边框加深，勾勒清晰轮廓 */
+            --border-dark: #94a3b8;
+            --success: #059669;         /* 更深的沉稳绿 */
+            --success-light: #d1fae5;
+            --danger: #e11d48;
             --radius-xl: 20px;
             --radius-lg: 14px;
             --radius-md: 10px;
             --radius-sm: 6px;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.01);
-            --shadow-md: 0 10px 30px -5px rgba(0,0,0,0.04), 0 4px 6px -4px rgba(0,0,0,0.02);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
+            --shadow-md: 0 10px 25px -5px rgba(0,0,0,0.08), 0 4px 10px -4px rgba(0,0,0,0.04);
             --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
@@ -38,81 +35,53 @@
 
         body { background-color: var(--bg-body); color: var(--text-main); height: 100vh; overflow: hidden; display: flex; justify-content: center; align-items: center; line-height: 1.5; }
 
-        /* 修复Bug：使用 Flexbox 动态高度约束，确保底部表单永不消失 */
         .container { width: 100%; max-width: 680px; height: 100%; max-height: 860px; display: flex; flex-direction: column; gap: 16px; padding: 20px; }
 
-        /* 各个模块固定，不参与压缩 */
         .header, .stats-card, .search-box, .list-header, .form-wrapper { flex-shrink: 0; }
 
         .header { display: flex; justify-content: space-between; align-items: center; }
-        .header h1 { font-size: 1.4rem; font-weight: 700; color: #0f172a; letter-spacing: -0.01em; }
+        .header h1 { font-size: 1.4rem; font-weight: 700; color: var(--text-main); letter-spacing: -0.01em; }
         .header-actions { display: flex; gap: 10px; }
         
-        .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border-dark); padding: 6px 14px; border-radius: var(--radius-md); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 4px;}
-        .btn-ghost:hover { background: var(--bg-card); color: var(--primary); border-color: var(--primary-light); box-shadow: var(--shadow-sm); }
-        .btn-ghost.danger:hover { color: var(--danger); border-color: #ffe4e6; }
+        .btn-ghost { background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border-color); padding: 6px 14px; border-radius: var(--radius-md); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 4px; box-shadow: var(--shadow-sm);}
+        .btn-ghost:hover { color: var(--primary); border-color: var(--primary); }
+        .btn-ghost.danger:hover { color: var(--danger); border-color: var(--danger); }
 
         .stats-card { background: var(--bg-card); border-radius: var(--radius-lg); padding: 20px 24px; box-shadow: var(--shadow-md); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
         .stat-group { display: flex; gap: 32px; }
         .stat-box { display: flex; flex-direction: column; }
-        .stat-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; letter-spacing: 0.05em; margin-bottom: 2px; }
-        .stat-value { font-size: 1.6rem; font-weight: 800; color: #0f172a; font-variant-numeric: tabular-nums; }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; letter-spacing: 0.05em; margin-bottom: 2px; }
+        .stat-value { font-size: 1.6rem; font-weight: 800; color: var(--text-main); font-variant-numeric: tabular-nums; }
         
-        /* 专注计时器：颜色变淡、按钮变大 */
         .timer-module { display: flex; align-items: center; gap: 16px; }
-        .timer-display { 
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; 
-            font-size: 1.2rem; 
-            font-weight: 400; 
-            color: var(--timer-muted); 
-            letter-spacing: 1px;
-            font-variant-numeric: tabular-nums;
-            transition: color 0.3s ease;
-        }
-        .timer-module.active .timer-display { color: var(--text-muted); }
+        .timer-display { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 1.2rem; font-weight: 500; color: var(--timer-muted); letter-spacing: 1px; font-variant-numeric: tabular-nums; transition: color 0.3s ease; }
+        .timer-module.active .timer-display { color: var(--text-main); font-weight: 600;}
 
         .timer-controls { display: flex; gap: 10px; }
-        .timer-btn { 
-            width: 44px; height: 44px; /* 加大触控面积，更好按 */
-            background: var(--bg-body); 
-            border: 1px solid var(--border-dark); 
-            color: var(--text-muted); 
-            cursor: pointer; 
-            display: flex; align-items: center; justify-content: center; 
-            border-radius: 14px; 
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
-        }
-        .timer-btn svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2; fill: none; }
-        .timer-btn:hover { background: var(--border-dark); color: var(--text-main); transform: scale(1.05); }
+        .timer-btn { width: 44px; height: 44px; background: var(--bg-body); border: 1px solid var(--border-color); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 14px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .timer-btn svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2.5; fill: none; }
+        .timer-btn:hover { background: #d3dce6; color: var(--text-main); border-color: var(--border-dark); transform: scale(1.05); }
         .timer-btn:active { transform: scale(0.95); }
         
-        .timer-btn.play-btn svg.fill-icon { fill: currentColor; }
-        .timer-module.active .timer-btn.play-btn { background: var(--success-light); border-color: #a7f3d0; color: var(--success); }
+        .timer-btn.play-btn svg.fill-icon { fill: currentColor; stroke-width: 1.5; }
+        .timer-module.active .timer-btn.play-btn { background: var(--success-light); border-color: var(--success); color: var(--success); }
 
-        .search-input { width: 100%; padding: 12px 18px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); font-size: 0.95rem; outline: none; box-shadow: var(--shadow-sm); transition: all 0.2s; color: var(--text-main); }
-        .search-input:focus { border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.05); }
-        .search-input::placeholder { color: var(--text-faint); }
+        .search-input { width: 100%; padding: 12px 18px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); font-size: 0.95rem; outline: none; box-shadow: var(--shadow-sm); transition: all 0.2s; color: var(--text-main); font-weight: 500;}
+        .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(67, 56, 202, 0.1); }
+        .search-input::placeholder { color: var(--text-faint); font-weight: 400;}
 
-        .list-header { display: flex; justify-content: space-between; align-items: flex-end; padding: 0 4px 4px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+        .list-header { display: flex; justify-content: space-between; align-items: flex-end; padding: 0 4px 4px; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); }
 
-        /* 核心修补点：使用 Flexbox 自适应剩余空间 */
-        .scroll-area {
-            flex: 1; 
-            min-height: 0; 
-            max-height: 480px; 
-            overflow-y: auto; 
-            padding-right: 6px;
-            padding-bottom: 2px;
-            scroll-behavior: smooth;
-        }
+        .scroll-area { flex: 1; min-height: 0; max-height: 480px; overflow-y: auto; padding-right: 6px; padding-bottom: 2px; scroll-behavior: smooth; }
         
         .scroll-area::-webkit-scrollbar { width: 4px; }
         .scroll-area::-webkit-scrollbar-track { background: transparent; }
         .scroll-area::-webkit-scrollbar-thumb { background-color: var(--border-dark); border-radius: 10px; }
         
         .task-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-        .task-item { background: var(--bg-card); border-radius: var(--radius-md); padding: 14px 16px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease; position: relative; }
-        .task-item.dragging { opacity: 0.6; transform: scale(0.98); box-shadow: var(--shadow-md); z-index: 10; }
+        
+        .task-item { background: var(--bg-card); border-radius: var(--radius-md); padding: 14px 16px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.3s; position: relative; }
+        .task-item.dragging { opacity: 0.8; transform: scale(0.98); box-shadow: var(--shadow-md); border-color: var(--primary); z-index: 10; }
         
         .task-view { display: flex; align-items: center; width: 100%; gap: 12px; }
         .drag-handle { color: var(--text-faint); cursor: grab; display: flex; align-items: center; padding: 4px; margin-left: -4px; transition: color 0.2s; }
@@ -120,45 +89,74 @@
         .drag-handle svg { width: 14px; height: 14px; }
 
         .task-checkbox { width: 18px; height: 18px; accent-color: var(--success); cursor: pointer; flex-shrink: 0; }
-        .task-name { font-size: 0.95rem; color: var(--text-main); font-weight: 500; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .task-badge { font-size: 0.75rem; background-color: var(--bg-body); color: var(--text-muted); padding: 3px 8px; border-radius: 12px; font-weight: 600; margin-left: auto; font-variant-numeric: tabular-nums; }
+        .task-name { font-size: 0.95rem; color: var(--text-main); font-weight: 600; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: color 0.3s; }
+        .task-badge { font-size: 0.75rem; background-color: var(--bg-body); color: var(--text-muted); padding: 4px 10px; border-radius: 12px; font-weight: 700; margin-left: auto; font-variant-numeric: tabular-nums; transition: background-color 0.3s; border: 1px solid var(--border-color);}
         
-        .task-actions { display: flex; gap: 4px; opacity: 0.3; transition: opacity 0.2s; }
+        .task-actions { display: flex; gap: 4px; opacity: 0.4; transition: opacity 0.2s; }
         .task-item:hover .task-actions { opacity: 1; }
         
-        .btn-icon { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .btn-icon { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 6px; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
         .btn-icon:hover { background-color: var(--bg-body); color: var(--primary); }
-        .btn-icon.danger:hover { color: var(--danger); background-color: #fff1f2; }
+        .btn-icon.danger:hover { color: var(--danger); background-color: #ffe4e6; }
         .btn-icon.success:hover { color: var(--success); background-color: var(--success-light); }
-        .btn-icon svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round;}
+        .btn-icon svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round;}
 
-        .task-item.completed { background-color: transparent; border-color: transparent; box-shadow: none; opacity: 0.6; }
-        .task-item.completed .task-name { color: var(--text-disabled); text-decoration: line-through; }
-        .task-item.completed .task-badge { background-color: var(--border-dark); }
+        .task-item.completed { background-color: #f8fafc; opacity: 0.7; }
+        .task-item.completed .task-name { color: var(--text-muted); text-decoration: line-through; font-weight: 500;}
+        .task-item.completed .task-badge { background-color: transparent; border-color: transparent; }
 
         .task-edit { display: flex; align-items: center; gap: 10px; width: 100%; }
-        .edit-input-name { flex: 1; padding: 6px 10px; border: 1px solid var(--primary-light); border-radius: var(--radius-sm); font-size: 0.95rem; outline: none; }
-        .edit-input-duration { width: 60px; padding: 6px; border: 1px solid var(--primary-light); border-radius: var(--radius-sm); font-size: 0.85rem; text-align: center; outline: none; font-variant-numeric: tabular-nums; }
+        .edit-input-name { flex: 1; padding: 6px 10px; border: 1px solid var(--primary); border-radius: var(--radius-sm); font-size: 0.95rem; outline: none; font-weight: 500; color: var(--text-main);}
+        .edit-input-duration { width: 60px; padding: 6px; border: 1px solid var(--primary); border-radius: var(--radius-sm); font-size: 0.85rem; text-align: center; outline: none; font-variant-numeric: tabular-nums; font-weight: 500; color: var(--text-main);}
 
         .form-wrapper { margin-top: auto; background: var(--bg-card); border-radius: var(--radius-lg); padding: 18px 20px; box-shadow: var(--shadow-md); border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 14px; }
         .input-group { display: flex; gap: 10px; }
-        .input-task { flex: 1; padding: 10px 14px; background: var(--bg-body); border: 1px solid transparent; border-radius: var(--radius-md); font-size: 0.95rem; outline: none; transition: all 0.2s; }
-        .input-task:focus { background: #ffffff; border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.05); }
-        .btn-add { background-color: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: var(--radius-md); font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
-        .btn-add:hover { background-color: #4338ca; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
+        .input-task { flex: 1; padding: 10px 14px; background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 0.95rem; outline: none; transition: all 0.2s; color: var(--text-main); font-weight: 500;}
+        .input-task:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(67, 56, 202, 0.1); }
+        .input-task::placeholder { font-weight: 400; color: var(--text-faint); }
+        
+        .btn-add { background-color: var(--primary); color: white; border: none; padding: 10px 22px; border-radius: var(--radius-md); font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.2s ease; }
+        .btn-add:hover { background-color: #3730a3; box-shadow: 0 4px 12px rgba(67, 56, 202, 0.25); transform: translateY(-1px);}
+        .btn-add:active { transform: translateY(0); }
 
         .time-options { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .time-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; margin-right: 4px;}
+        .time-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 700; margin-right: 4px;}
         .radio-pills { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
         .radio-pill { position: relative; }
         .radio-pill input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
-        .radio-pill label { display: inline-block; padding: 4px 12px; border: 1px solid transparent; border-radius: 20px; font-size: 0.8rem; color: var(--text-muted); cursor: pointer; transition: all 0.2s ease; background-color: var(--bg-body); user-select: none; font-weight: 500;}
-        .radio-pill input[type="radio"]:checked + label { background-color: var(--primary-light); color: var(--primary); font-weight: 600; }
+        .radio-pill label { display: inline-block; padding: 5px 14px; border: 1px solid var(--border-color); border-radius: 20px; font-size: 0.8rem; color: var(--text-muted); cursor: pointer; transition: all 0.2s ease; background-color: var(--bg-card); user-select: none; font-weight: 600;}
+        .radio-pill input[type="radio"]:checked + label { background-color: var(--primary); color: white; border-color: var(--primary); }
         
-        .custom-input-wrapper { display: inline-flex; align-items: center; gap: 4px; }
-        .input-custom-time { width: 50px; padding: 2px 4px; border: 1px solid transparent; border-radius: 4px; background: transparent; font-size: 0.8rem; outline: none; text-align: center; color: var(--text-main); font-variant-numeric: tabular-nums; }
-        .radio-pill input[type="radio"]:checked + label .input-custom-time { border-bottom: 1px solid var(--primary); background: #ffffff;}
-        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-faint); font-size: 0.9rem; font-weight: 500; }
+        .custom-input-wrapper { display: inline-flex; align-items: center; gap: 2px; }
+        
+        .input-custom-time { 
+            width: 36px; 
+            padding: 0; 
+            border: none;
+            border-bottom: 2px dashed var(--border-dark);
+            border-radius: 0; 
+            background: transparent; 
+            font-size: 0.85rem; 
+            font-weight: 700;
+            outline: none; 
+            text-align: center; 
+            color: var(--text-muted); 
+            font-variant-numeric: tabular-nums; 
+            transition: all 0.2s; 
+        }
+        .input-custom-time:focus { border-bottom-color: var(--primary); color: var(--text-main);}
+        .radio-pill input[type="radio"]:checked + label .input-custom-time { 
+            border-bottom-color: white; 
+            border-bottom-style: solid;
+            color: white;
+        }
+        .radio-pill input[type="radio"]:checked + label .input-custom-time::placeholder { color: rgba(255,255,255,0.7); }
+        
+        .input-custom-time::-webkit-inner-spin-button,
+        .input-custom-time::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        .input-custom-time { -moz-appearance: textfield; }
+
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-faint); font-size: 0.95rem; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -178,7 +176,7 @@
         </div>
     </div>
 
-    <!-- 数据面板与弱化大按钮计时器 -->
+    <!-- 数据面板与计时器 -->
     <div class="stats-card">
         <div class="stat-group">
             <div class="stat-box">
@@ -187,7 +185,7 @@
             </div>
             <div class="stat-box">
                 <span class="stat-label">预估时长</span>
-                <span class="stat-value"><span id="timeText">0</span><span style="font-size: 0.9rem; margin-left: 2px; color: var(--text-muted); font-weight: 600;">m</span></span>
+                <span class="stat-value"><span id="timeText">0</span><span style="font-size: 0.9rem; margin-left: 2px; color: var(--text-muted); font-weight: 700;">m</span></span>
             </div>
         </div>
         
@@ -195,13 +193,10 @@
             <span class="timer-display" id="timerDisplay">00:00:00</span>
             <div class="timer-controls">
                 <button class="timer-btn play-btn" id="timerToggle" title="开始/暂停实际耗时">
-                    <!-- 播放图标 (填充) -->
                     <svg id="iconPlay" class="fill-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                    <!-- 暂停图标 (描边) -->
                     <svg id="iconPause" style="display: none;" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
                 </button>
                 <button class="timer-btn" id="timerReset" title="清零计时">
-                    <!-- 重置图标 -->
                     <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                 </button>
             </div>
@@ -222,7 +217,7 @@
         <ul class="task-list" id="taskList"></ul>
     </div>
 
-    <!-- 坚如磐石的常驻底部表单 -->
+    <!-- 底部表单 -->
     <div class="form-wrapper">
         <div class="input-group">
             <input type="text" id="taskInput" class="input-task" placeholder="准备做些什么？" maxlength="50" autocomplete="off">
@@ -238,7 +233,7 @@
                 <div class="radio-pill">
                     <input type="radio" id="tCustom" name="timeOption" value="custom">
                     <label for="tCustom" class="custom-input-wrapper">
-                        <input type="number" id="customTimeInput" class="input-custom-time" min="1" max="1440" placeholder="0" disabled>m
+                        <input type="number" id="customTimeInput" class="input-custom-time" min="1" max="1440" placeholder="120">m
                     </label>
                 </div>
             </div>
@@ -248,7 +243,7 @@
 
 <script>
     (function () {
-        const STORAGE_KEY = 'habit_tracker_elegant_v4';
+        const STORAGE_KEY = 'habit_tracker_elegant_v5';
         let state = { tasks: [] };
         let editingId = null; 
 
@@ -330,7 +325,8 @@
             const selected = document.querySelector('input[name="timeOption"]:checked');
             if (!selected) return 20;
             if (selected.value === 'custom') {
-                const val = parseInt(els.customTimeInput.value, 10);
+                const valStr = els.customTimeInput.value.trim();
+                const val = valStr === '' ? 120 : parseInt(valStr, 10);
                 return (isNaN(val) || val <= 0) ? null : val;
             }
             return parseInt(selected.value, 10);
@@ -338,11 +334,19 @@
 
         els.timeRadios.forEach(radio => {
             radio.addEventListener('change', (e) => {
-                if (e.target.value === 'custom') { els.customTimeInput.disabled = false; els.customTimeInput.focus(); } 
-                else { els.customTimeInput.disabled = true; els.customTimeInput.value = ''; }
+                if (e.target.value === 'custom') { els.customTimeInput.focus(); } 
             });
         });
-        els.customTimeInput.addEventListener('click', () => { document.getElementById('tCustom').checked = true; els.customTimeInput.disabled = false; });
+        
+        ['focus', 'input', 'click'].forEach(evt => {
+            els.customTimeInput.addEventListener(evt, () => {
+                document.getElementById('tCustom').checked = true; 
+            });
+        });
+
+        els.customTimeInput.addEventListener('keypress', e => {
+            if (e.key === 'Enter') { handleAddTask(); }
+        });
 
         function handleAddTask() {
             const name = els.taskInput.value.trim();
@@ -353,7 +357,12 @@
             state.tasks.push({ id: 't_' + Date.now(), name: name, duration: duration, completed: false });
             enforceCompletedAtTop();
             saveData();
-            render();
+            
+            if (document.startViewTransition) {
+                document.startViewTransition(() => render());
+            } else {
+                render();
+            }
             
             els.taskInput.value = '';
             els.taskInput.focus();
@@ -368,8 +377,16 @@
                 if (task.completed) editingId = null; 
                 enforceCompletedAtTop();
                 saveData();
-                render();
-                applySearchFilter();
+                
+                if (document.startViewTransition) {
+                    document.startViewTransition(() => {
+                        render();
+                        applySearchFilter();
+                    });
+                } else {
+                    render();
+                    applySearchFilter();
+                }
             }
         }
 
@@ -450,6 +467,8 @@
                     li.dataset.id = task.id;
                     li.dataset.name = task.name.toLowerCase();
                     li.draggable = editingId !== task.id; 
+                    
+                    li.style.viewTransitionName = `task-${task.id}`;
 
                     if (editingId === task.id) {
                         li.innerHTML = `
@@ -464,12 +483,17 @@
                         const inpDur = li.querySelector('.edit-input-duration');
                         inpName.focus();
                         
-                        li.querySelector('.btn-save').addEventListener('click', () => {
+                        const handleSave = () => {
                             const newN = inpName.value.trim();
                             const newD = parseInt(inpDur.value, 10);
                             if(newN && newD > 0) saveEdit(task.id, newN, newD);
                             else alert("请输入有效的任务名与时长");
-                        });
+                        };
+
+                        li.querySelector('.btn-save').addEventListener('click', handleSave);
+                        inpName.addEventListener('keydown', e => { if (e.key === 'Enter') handleSave(); });
+                        inpDur.addEventListener('keydown', e => { if (e.key === 'Enter') handleSave(); });
+
                         li.querySelector('.btn-cancel').addEventListener('click', () => { editingId = null; render(); });
                     } else {
                         li.innerHTML = `
