@@ -247,9 +247,12 @@
         let state = { tasks: [] };
         let editingId = null; 
 
+        // 优化后的精准计时变量
         let timerInterval = null;
         let timerSeconds = 0;
         let isTimerRunning = false;
+        let startTimeStamp = null; // 记录开始计时时的绝对时间戳
+        let accumulatedSeconds = 0; // 暂停前累积的秒数
 
         const els = {
             taskInput: document.getElementById('taskInput'),
@@ -296,18 +299,50 @@
 
         function updateTimerUI() { els.timerDisplay.textContent = formatTime(timerSeconds); }
 
-        els.timerToggle.addEventListener('click', () => {
-            isTimerRunning = !isTimerRunning;
-            if (isTimerRunning) {
+        // 核心修改：利用时间戳差值计算秒数，彻底解决切屏、后台降速导致计时变慢的问题
+        function startTimer() {
+            if (!isTimerRunning) {
+                isTimerRunning = true;
+                startTimeStamp = Date.now();
                 els.iconPlay.style.display = 'none';
                 els.iconPause.style.display = 'block';
                 els.timerModule.classList.add('active');
-                timerInterval = setInterval(() => { timerSeconds++; updateTimerUI(); }, 1000);
-            } else {
+
+                timerInterval = setInterval(() => {
+                    const now = Date.now();
+                    const deltaSeconds = Math.floor((now - startTimeStamp) / 1000);
+                    timerSeconds = accumulatedSeconds + deltaSeconds;
+                    updateTimerUI();
+                }, 200); // 频率提高到200ms，切回屏幕时能瞬间刷出最新时间
+            }
+        }
+
+        function pauseTimer() {
+            if (isTimerRunning) {
+                isTimerRunning = false;
+                clearInterval(timerInterval);
+                accumulatedSeconds = timerSeconds; // 记录当前累积秒数
                 els.iconPlay.style.display = 'block';
                 els.iconPause.style.display = 'none';
                 els.timerModule.classList.remove('active');
-                clearInterval(timerInterval);
+            }
+        }
+
+        els.timerToggle.addEventListener('click', () => {
+            if (isTimerRunning) {
+                pauseTimer();
+            } else {
+                startTimer();
+            }
+        });
+
+        // 页面重新可见时（比如切回标签页），立即触发一次校准更新，防止视觉上有几秒的延迟
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && isTimerRunning) {
+                const now = Date.now();
+                const deltaSeconds = Math.floor((now - startTimeStamp) / 1000);
+                timerSeconds = accumulatedSeconds + deltaSeconds;
+                updateTimerUI();
             }
         });
 
@@ -315,6 +350,8 @@
             isTimerRunning = false;
             clearInterval(timerInterval);
             timerSeconds = 0;
+            accumulatedSeconds = 0;
+            startTimeStamp = null;
             updateTimerUI();
             els.iconPlay.style.display = 'block';
             els.iconPause.style.display = 'none';
@@ -555,6 +592,8 @@
                     isTimerRunning = false;
                     clearInterval(timerInterval);
                     timerSeconds = 0;
+                    accumulatedSeconds = 0;
+                    startTimeStamp = null;
                     updateTimerUI();
                     els.iconPlay.style.display = 'block'; els.iconPause.style.display = 'none'; els.timerModule.classList.remove('active');
                     saveData(); render(); applySearchFilter();
