@@ -5,13 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>习惯打卡与时间记录工具</title>
     <style>
-        /* 
-         * 色彩权重升级：提升对比度，消除发虚感
+        /* * 色彩权重升级：提升对比度，消除发虚感
          */
         :root {
             --primary: #4338ca;         /* 更浓郁的深靛蓝 */
             --primary-light: #e0e7ff;
-            --bg-body: #e2e8f0;         /* 带有实体感的冷灰，衬托白色卡片 */
+            --bg-body: #64748b;         /* 【修改点】：背景加深为深石板灰，衬托白色卡片 */
             --bg-card: #ffffff;
             --text-main: #0f172a;       /* 极深蓝灰，字迹更锐利 */
             --text-muted: #475569;      /* 加深的次要文本色 */
@@ -58,9 +57,9 @@
         .timer-module.active .timer-display { color: var(--text-main); font-weight: 600;}
 
         .timer-controls { display: flex; gap: 10px; }
-        .timer-btn { width: 44px; height: 44px; background: var(--bg-body); border: 1px solid var(--border-color); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 14px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .timer-btn { width: 44px; height: 44px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 14px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
         .timer-btn svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2.5; fill: none; }
-        .timer-btn:hover { background: #d3dce6; color: var(--text-main); border-color: var(--border-dark); transform: scale(1.05); }
+        .timer-btn:hover { background: #e2e8f0; color: var(--text-main); border-color: var(--border-dark); transform: scale(1.05); }
         .timer-btn:active { transform: scale(0.95); }
         
         .timer-btn.play-btn svg.fill-icon { fill: currentColor; stroke-width: 1.5; }
@@ -70,7 +69,7 @@
         .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(67, 56, 202, 0.1); }
         .search-input::placeholder { color: var(--text-faint); font-weight: 400;}
 
-        .list-header { display: flex; justify-content: space-between; align-items: flex-end; padding: 0 4px 4px; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); }
+        .list-header { display: flex; justify-content: space-between; align-items: flex-end; padding: 0 4px 4px; font-size: 0.85rem; font-weight: 700; color: var(--bg-card); /* 【修改点】：文字颜色调亮以适应深色背景 */ }
 
         .scroll-area { flex: 1; min-height: 0; max-height: 480px; overflow-y: auto; padding-right: 6px; padding-bottom: 2px; scroll-behavior: smooth; }
         
@@ -90,13 +89,13 @@
 
         .task-checkbox { width: 18px; height: 18px; accent-color: var(--success); cursor: pointer; flex-shrink: 0; }
         .task-name { font-size: 0.95rem; color: var(--text-main); font-weight: 600; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: color 0.3s; }
-        .task-badge { font-size: 0.75rem; background-color: var(--bg-body); color: var(--text-muted); padding: 4px 10px; border-radius: 12px; font-weight: 700; margin-left: auto; font-variant-numeric: tabular-nums; transition: background-color 0.3s; border: 1px solid var(--border-color);}
+        .task-badge { font-size: 0.75rem; background-color: #f1f5f9; color: var(--text-muted); padding: 4px 10px; border-radius: 12px; font-weight: 700; margin-left: auto; font-variant-numeric: tabular-nums; transition: background-color 0.3s; border: 1px solid var(--border-color);}
         
         .task-actions { display: flex; gap: 4px; opacity: 0.4; transition: opacity 0.2s; }
         .task-item:hover .task-actions { opacity: 1; }
         
         .btn-icon { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 6px; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-        .btn-icon:hover { background-color: var(--bg-body); color: var(--primary); }
+        .btn-icon:hover { background-color: #f1f5f9; color: var(--primary); }
         .btn-icon.danger:hover { color: var(--danger); background-color: #ffe4e6; }
         .btn-icon.success:hover { color: var(--success); background-color: var(--success-light); }
         .btn-icon svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round;}
@@ -156,15 +155,14 @@
         .input-custom-time::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         .input-custom-time { -moz-appearance: textfield; }
 
-        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-faint); font-size: 0.95rem; font-weight: 600; }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--bg-card); font-size: 0.95rem; font-weight: 600; /* 【修改点】：空状态文字调亮 */ }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h1>专注记录</h1>
-        <div class="header-actions">
+        <h1 style="color: white;">专注记录</h1> <div class="header-actions">
             <button class="btn-ghost" id="exportBtn">
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 导出
@@ -176,7 +174,6 @@
         </div>
     </div>
 
-    <!-- 数据面板与计时器 -->
     <div class="stats-card">
         <div class="stat-group">
             <div class="stat-box">
@@ -211,13 +208,11 @@
         <span>任务清单</span>
     </div>
 
-    <!-- 动态弹性滚动区域 -->
     <div class="scroll-area" id="scrollArea">
         <div class="empty-state" id="emptyState" style="display: none;">杯子空了，添加点什么吧。</div>
         <ul class="task-list" id="taskList"></ul>
     </div>
 
-    <!-- 底部表单 -->
     <div class="form-wrapper">
         <div class="input-group">
             <input type="text" id="taskInput" class="input-task" placeholder="准备做些什么？" maxlength="50" autocomplete="off">
@@ -247,12 +242,11 @@
         let state = { tasks: [] };
         let editingId = null; 
 
-        // 优化后的精准计时变量
         let timerInterval = null;
         let timerSeconds = 0;
         let isTimerRunning = false;
-        let startTimeStamp = null; // 记录开始计时时的绝对时间戳
-        let accumulatedSeconds = 0; // 暂停前累积的秒数
+        let startTimeStamp = null; 
+        let accumulatedSeconds = 0; 
 
         const els = {
             taskInput: document.getElementById('taskInput'),
@@ -299,7 +293,6 @@
 
         function updateTimerUI() { els.timerDisplay.textContent = formatTime(timerSeconds); }
 
-        // 核心修改：利用时间戳差值计算秒数，彻底解决切屏、后台降速导致计时变慢的问题
         function startTimer() {
             if (!isTimerRunning) {
                 isTimerRunning = true;
@@ -313,7 +306,7 @@
                     const deltaSeconds = Math.floor((now - startTimeStamp) / 1000);
                     timerSeconds = accumulatedSeconds + deltaSeconds;
                     updateTimerUI();
-                }, 200); // 频率提高到200ms，切回屏幕时能瞬间刷出最新时间
+                }, 200); 
             }
         }
 
@@ -321,7 +314,7 @@
             if (isTimerRunning) {
                 isTimerRunning = false;
                 clearInterval(timerInterval);
-                accumulatedSeconds = timerSeconds; // 记录当前累积秒数
+                accumulatedSeconds = timerSeconds; 
                 els.iconPlay.style.display = 'block';
                 els.iconPause.style.display = 'none';
                 els.timerModule.classList.remove('active');
@@ -336,7 +329,6 @@
             }
         });
 
-        // 页面重新可见时（比如切回标签页），立即触发一次校准更新，防止视觉上有几秒的延迟
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden && isTimerRunning) {
                 const now = Date.now();
@@ -587,8 +579,11 @@
         function handleManualReset() {
             exportData(true);
             setTimeout(() => {
-                if (confirm('【重置确认】\n将取消所有任务完成状态并清零秒表。\n系统已为您导出备份数据，是否继续？')) {
-                    state.tasks.forEach(t => t.completed = false);
+                // 【修改点】：更新弹窗文案
+                if (confirm('【重置确认】\n将清理所有已完成任务并清零秒表，保留未完成任务。\n系统已为您导出备份数据，是否继续？')) {
+                    // 【修改点】：直接通过 filter 保留未完成的任务，抛弃已完成的
+                    state.tasks = state.tasks.filter(t => !t.completed);
+                    
                     isTimerRunning = false;
                     clearInterval(timerInterval);
                     timerSeconds = 0;
